@@ -1,4 +1,16 @@
 <configuration>
+    <springProfile name="dev">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d %p %c{1} [%t] %m%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="info" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
     <springProfile name="stag">
         <property name="HOME_LOG" value="/log"/>
         <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -20,6 +32,7 @@
             <appender-ref ref="FILE-ROLLING"/>
         </root>
     </springProfile>
+
     <springProfile name="prod">
         <property name="HOME_LOG" value="/log"/>
         <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
