@@ -6,7 +6,7 @@ import lombok.ToString;
 @Data
 @ToString
 public class SubmissionDto {
-    private int id;
+    private String buaaId;
     private int taskId;
     private String result;
 }
