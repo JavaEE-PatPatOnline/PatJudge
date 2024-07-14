@@ -9,6 +9,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -19,7 +21,9 @@ public class JudgeService {
     @RabbitListener(queues = RabbitMqConfig.PENDING)
     public void receive(JudgeRequest request) {
         log.info("Received {}:{}", request.getId(), request.getProblemId());
+        request.setJudgeTime(LocalDateTime.now());
         JudgeResponse response = judger.judge(request);
+        response.setCompleteTime(LocalDateTime.now());
         send(response);
     }
 

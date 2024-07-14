@@ -16,10 +16,10 @@ public class TestResult {
     private int score;
 
     /**
-     * Compilation error is a special case, in which all testcases are skipped.
-     * In this case, the {@code results} field contains only one element whose flag is "CE".
+     * If some error occurs that prevent test cases from running, this field is set to true.
+     * In this case, the {@code results} field contains only one element.
      */
-    private boolean compileError;
+    private boolean fatal;
 
     private List<TestCaseResult> results;
 
@@ -28,17 +28,17 @@ public class TestResult {
     }
 
     public static class Builder {
+        private final List<TestCaseResult> results = new ArrayList<>();
         private int score;
-        private boolean compileError;
-        private List<TestCaseResult> results = new ArrayList<>();
+        private boolean fatal;
 
         public Builder addScore(int score) {
             this.score += score;
             return this;
         }
 
-        public Builder compileError(TestCaseResult result) {
-            this.compileError = true;
+        public Builder fatalError(TestCaseResult result) {
+            this.fatal = true;
             return addResult(result);
         }
 
@@ -48,7 +48,7 @@ public class TestResult {
         }
 
         public TestResult build() {
-            return new TestResult(score, compileError, results);
+            return new TestResult(score, fatal, results);
         }
     }
 }

@@ -26,6 +26,7 @@ public class JudgeRequest {
     private String language;
 
     private LocalDateTime submitTime;
+    private LocalDateTime judgeTime;
 
 
     /**

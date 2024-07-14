@@ -1,10 +1,6 @@
-spring:
-  application:
-    name: PatBoot
-  rabbitmq:
-    host: ${RABBITMQ_HOST}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
-server:
-  port: 8081
+judge:
+  languages:
+    - 20;E:\IDE\Java\jdk-20.0.2\bin
+  problem-root: ..\PatBoot\volume\bucket\problem
+  judge-root: ..\PatBoot\volume\judge
+os: windows
