@@ -3,4 +3,3 @@ judge:
     - 20;E:\IDE\Java\jdk-20.0.2\bin
   problem-root: ..\PatBoot\volume\bucket\problem
   judge-root: ..\PatBoot\volume\judge
-os: windows

@@ -98,7 +98,7 @@ public class Juggernaut implements IJudger {
             }
             return descriptor;
         } catch (IOException e) {
-            log.error("Failed to initialize problem {}.", problemId, e);
+            log.error("Failed to initialize problem {}: {}.", problemId, e.getMessage());
             throw new JudgeErrorException(TestCaseResult.of(TestResultEnum.JE, "Failed to initialize problem."));
         }
     }
