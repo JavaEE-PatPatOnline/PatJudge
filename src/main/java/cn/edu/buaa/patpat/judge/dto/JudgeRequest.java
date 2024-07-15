@@ -26,8 +26,6 @@ public class JudgeRequest {
     private String language;
 
     private LocalDateTime submitTime;
-    private LocalDateTime judgeTime;
-
 
     /**
      * The extra information of the submission, e.g. the user information.

@@ -5,12 +5,12 @@ import cn.edu.buaa.patpat.judge.dto.*;
 import cn.edu.buaa.patpat.judge.models.ProblemDescriptor;
 import cn.edu.buaa.patpat.judge.services.ICompiler;
 import cn.edu.buaa.patpat.judge.services.IJudger;
+import cn.edu.buaa.patpat.judge.utils.Medias;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -93,8 +93,8 @@ public class Juggernaut implements IJudger {
             descriptor = yamlMapper.readValue(judgeOptions.getProblemYamlPath(problemId).toFile(), ProblemDescriptor.class);
             if (descriptor.isInit()) {
                 Path problemInitPath = judgeOptions.getProblemInitPath(problemId);
-                Path judgePath = judgeOptions.getJudgePath(submissionId);
-                FileCopyUtils.copy(problemInitPath.toFile(), judgePath.toFile());
+                Path judgePath = judgeOptions.getJudgeSourcePath(submissionId);
+                Medias.copyContent(problemInitPath, judgePath);
             }
             return descriptor;
         } catch (IOException e) {
@@ -105,12 +105,14 @@ public class Juggernaut implements IJudger {
 
     private JudgeResponse formatResponse(JudgeRequest request, TestCaseResult result) {
         JudgeResponse response = modelMapper.map(request, JudgeResponse.class);
+        response.setScore(result.getScore());
         response.setResult(TestResult.builder().fatalError(result).build());
         return response;
     }
 
     private JudgeResponse formatResponse(JudgeRequest request, TestResult result) {
         JudgeResponse response = modelMapper.map(request, JudgeResponse.class);
+        response.setScore(result.getScore());
         response.setResult(result);
         return response;
     }

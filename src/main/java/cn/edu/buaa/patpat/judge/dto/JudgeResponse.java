@@ -10,11 +10,12 @@ public class JudgeResponse {
     private int problemId;
     private String language;
 
+    private int score;
     private TestResult result;
 
     private LocalDateTime submitTime;
-    private LocalDateTime judgeTime;
-    private LocalDateTime completeTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     private Object payload;
 }

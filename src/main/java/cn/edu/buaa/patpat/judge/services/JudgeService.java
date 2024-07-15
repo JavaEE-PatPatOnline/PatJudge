@@ -21,13 +21,15 @@ public class JudgeService {
     @RabbitListener(queues = RabbitMqConfig.PENDING)
     public void receive(JudgeRequest request) {
         log.info("Received {}:{}", request.getId(), request.getProblemId());
-        request.setJudgeTime(LocalDateTime.now());
+        var startTime = LocalDateTime.now();
         JudgeResponse response = judger.judge(request);
-        response.setCompleteTime(LocalDateTime.now());
+        response.setStartTime(startTime);
+        response.setEndTime(LocalDateTime.now());
         send(response);
     }
 
     public void send(JudgeResponse response) {
+        log.info("Send {}:{}", response.getId(), response.getProblemId());
         rabbitTemplate.convertAndSend(RabbitMqConfig.RESULT, response);
     }
 }
