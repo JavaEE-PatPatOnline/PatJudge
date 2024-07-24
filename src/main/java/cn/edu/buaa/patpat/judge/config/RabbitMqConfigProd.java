@@ -7,10 +7,12 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 @RequiredArgsConstructor
-public class RabbitMqConfig {
+@Profile({ "stag", "prod" })
+public class RabbitMqConfigProd {
     /**
      * All tasks will be sent to this queue.
      */
