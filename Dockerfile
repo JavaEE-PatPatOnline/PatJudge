@@ -6,7 +6,6 @@ ARG VERSION
 ARG PROFILE
 
 COPY target/PatJudge-${VERSION}.jar /application.jar
-ENV PROFILE=${PROFILE}
 
 EXPOSE 8081
 
