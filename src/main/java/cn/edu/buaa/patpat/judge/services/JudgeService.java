@@ -1,10 +1,8 @@
 package cn.edu.buaa.patpat.judge.services;
 
-import cn.edu.buaa.patpat.judge.config.RabbitMqConfigDev;
 import cn.edu.buaa.patpat.judge.dto.JudgeRequest;
 import cn.edu.buaa.patpat.judge.dto.JudgeResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,10 +14,6 @@ public abstract class JudgeService {
     protected RabbitTemplate rabbitTemplate;
     @Autowired
     protected IJudger judger;
-
-    @RabbitListener(queues = RabbitMqConfigDev.PENDING)
-    public void receive(JudgeRequest request) {
-    }
 
     public void send(JudgeResponse response) {
         log.info("Send {}:{}", response.getId(), response.getProblemId());

@@ -56,8 +56,4 @@ public class JudgeOptions {
     public Path getJudgeSourcePath(int submissionId) {
         return Path.of(judgeRoot, String.valueOf(submissionId), "src");
     }
-
-    public Path getJudgeClassPath(int submissionId) {
-        return Path.of(judgeRoot, String.valueOf(submissionId), "out");
-    }
 }

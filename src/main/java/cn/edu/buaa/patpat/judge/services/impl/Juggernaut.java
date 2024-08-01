@@ -1,5 +1,6 @@
 package cn.edu.buaa.patpat.judge.services.impl;
 
+import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.config.JudgeOptions;
 import cn.edu.buaa.patpat.judge.dto.*;
 import cn.edu.buaa.patpat.judge.models.ProblemDescriptor;
@@ -13,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,23 +41,26 @@ public class Juggernaut implements IJudger {
 
     @Override
     public JudgeResponse judge(JudgeRequest request) {
+        final String judgePath = judgeOptions.getJudgePath(request.getId()).toString();
+
         // initialize problem
         ProblemDescriptor descriptor;
         try {
             String binary = checkVersion(request.getLanguage());
             descriptor = initProblem(request.getProblemId(), request.getId());
-            compiler.compileCode(binary, judgeOptions.getJudgePath(request.getId()).toString());
+            compiler.compileCode(binary, judgePath);
+            initializeSandboxPolicy(judgeOptions.getJudgePath(request.getId()).toString());
         } catch (JudgeErrorException e) {
             return formatResponse(request, e.getResult());
         } catch (JudgeFailedException e) {
             return formatResponse(request, e.getResult());
         }
-
+        
         // run test cases
         List<Avatar> avatars = descriptor.getCases().stream()
                 .map(testCase -> new Avatar(
                         judgeOptions.getProblemPath(request.getProblemId()).toString(),
-                        judgeOptions.getJudgeClassPath(request.getId()).toString(),
+                        judgePath,
                         judgeOptions.getBinPath(request.getLanguage()),
                         descriptor,
                         testCase)
@@ -115,5 +120,20 @@ public class Juggernaut implements IJudger {
         response.setScore(result.getScore());
         response.setResult(result);
         return response;
+    }
+
+    private void initializeSandboxPolicy(String judgePath) throws JudgeErrorException {
+        String content = String.format("""
+                        grant {
+                            permission java.io.FilePermission "%s", "read, write";
+                        };
+                        """,
+                Path.of(judgePath, "-"));
+        try {
+            Files.writeString(Path.of(judgePath, Globals.POLICY_FILENAME), content);
+        } catch (IOException e) {
+            log.error("Failed to initialize sandbox policy: {}.", e.getMessage());
+            throw new JudgeErrorException(TestCaseResult.of(TestResultEnum.JE, "Judge initialization failed."));
+        }
     }
 }

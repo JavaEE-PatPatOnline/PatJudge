@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 @Profile({ "stag", "prod" })
 public class JudgeServiceProd extends JudgeService {
     @RabbitListener(queues = RabbitMqConfigProd.PENDING)

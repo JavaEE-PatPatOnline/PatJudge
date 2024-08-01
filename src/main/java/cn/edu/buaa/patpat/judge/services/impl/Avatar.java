@@ -22,18 +22,20 @@ import java.util.concurrent.TimeoutException;
 
 @AllArgsConstructor
 public class Avatar implements Callable<TestCaseResult> {
+    private static final String POLICY_WARNING = """
+            WARNING: A command line option has enabled the Security Manager
+            WARNING: The Security Manager is deprecated and will be removed in a future release
+            """;
+
     /**
      * The path of the test case data.
      */
     private final String problemPath;
-
     /**
-     * The path of the compiled class.
+     * The path of the judged project. It contains src/ and out/.
      */
-    private final String classPath;
-
+    private final String judgePath;
     private final String binPath;
-
     private final ProblemDescriptor descriptor;
     private final CaseDescriptor testCase;
 
@@ -50,8 +52,12 @@ public class Avatar implements Callable<TestCaseResult> {
 
         try {
             exitValue = ProcessDescriptor.create()
-                    .exec(exe, "-classpath", ".", descriptor.getMainClass())
-                    .setWorkingDirectory(classPath)
+                    .exec(exe,
+                            "-Djava.security.manager",
+                            "-Djava.security.policy=" + Globals.POLICY_FILENAME,
+                            "-classpath", "out",
+                            descriptor.getMainClass())
+                    .setWorkingDirectory(judgePath)
                     .redirectInput(inputPath.toString())
                     .redirectOutput(output)
                     .redirectError(error)
@@ -60,6 +66,8 @@ public class Avatar implements Callable<TestCaseResult> {
             return TestCaseResult.of(TestResultEnum.JE, "Failed to run the test case " + testCase.getId());
         } catch (TimeoutException e) {
             return TestCaseResult.of(TestResultEnum.TLE, e.getMessage());
+        } catch (Exception e) {
+            return TestCaseResult.of(TestResultEnum.RE, truncateMessage(e.getMessage()));
         }
 
         if (exitValue != 0) {
@@ -89,6 +97,9 @@ public class Avatar implements Callable<TestCaseResult> {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (POLICY_WARNING.contains(line)) {
+                    continue;
+                }
                 if (sb.length() + line.length() <= Globals.MAX_MESSAGE_LENGTH) {
                     sb.append(line).append("\n");
                 } else {
@@ -104,7 +115,17 @@ public class Avatar implements Callable<TestCaseResult> {
         return sb.toString();
     }
 
-    private IDiffProvider getDiffProvider(String mode) throws JudgeFailedException {
+    private String truncateMessage(String message) {
+        if (message.startsWith(POLICY_WARNING)) {
+            message = message.substring(POLICY_WARNING.length());
+        }
+        if (message.length() <= Globals.MAX_MESSAGE_LENGTH) {
+            return message;
+        }
+        return message.substring(0, Globals.MAX_MESSAGE_LENGTH) + "...";
+    }
+
+    private IDiffProvider getDiffProvider(String mode) {
         if ("advanced".equalsIgnoreCase(mode)) {
             return new AdvancedDiffProvider();
         }
