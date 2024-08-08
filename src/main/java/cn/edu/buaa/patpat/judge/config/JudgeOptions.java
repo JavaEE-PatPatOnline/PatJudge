@@ -16,7 +16,8 @@ public class JudgeOptions {
     private List<String> languages;
 
     private String problemRoot;
-    private String judgeRoot;
+    private String submissionRoot;
+    private String sandBoxPath;
 
     private Map<String, String> binMap;
 
@@ -47,13 +48,5 @@ public class JudgeOptions {
 
     public Path getProblemInitPath(int problemId) {
         return Path.of(problemRoot, String.valueOf(problemId), "init");
-    }
-
-    public Path getJudgePath(int submissionId) {
-        return Path.of(judgeRoot, String.valueOf(submissionId));
-    }
-
-    public Path getJudgeSourcePath(int submissionId) {
-        return Path.of(judgeRoot, String.valueOf(submissionId), "src");
     }
 }

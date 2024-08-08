@@ -10,4 +10,5 @@ server:
   port: 8081
 judge:
   problem-root: /problem
-  judge-root: /judge
+  submission-root: /submission
+  sandbox-path: /sandbox

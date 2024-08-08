@@ -1,4 +1,4 @@
-package cn.edu.buaa.patpat.judge.services;
+package cn.edu.buaa.patpat.judge.extensions.judge;
 
 import cn.edu.buaa.patpat.judge.dto.JudgeRequest;
 import cn.edu.buaa.patpat.judge.dto.JudgeResponse;

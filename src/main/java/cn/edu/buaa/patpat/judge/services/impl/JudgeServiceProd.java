@@ -1,9 +1,9 @@
-package cn.edu.buaa.patpat.judge.services;
+package cn.edu.buaa.patpat.judge.services.impl;
 
 import cn.edu.buaa.patpat.judge.config.RabbitMqConfigProd;
 import cn.edu.buaa.patpat.judge.dto.JudgeRequest;
 import cn.edu.buaa.patpat.judge.dto.JudgeResponse;
-import lombok.extern.slf4j.Slf4j;
+import cn.edu.buaa.patpat.judge.services.JudgeService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

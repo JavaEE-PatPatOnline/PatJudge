@@ -27,6 +27,8 @@ public class JudgeRequest {
 
     private LocalDateTime submitTime;
 
+    private String record;
+
     /**
      * The extra information of the submission, e.g. the user information.
      * As the judge doesn't need to know the user information, we use Object here.

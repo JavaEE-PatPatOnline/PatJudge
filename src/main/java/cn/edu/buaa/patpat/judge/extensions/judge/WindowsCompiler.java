@@ -1,4 +1,4 @@
-package cn.edu.buaa.patpat.judge.services.impl;
+package cn.edu.buaa.patpat.judge.extensions.judge;
 
 
 import org.springframework.context.annotation.Profile;
