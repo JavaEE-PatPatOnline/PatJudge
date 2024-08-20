@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -31,6 +31,7 @@ jobs:
           port: 22
           source: "target/*.jar,Dockerfile"
           target: ${{ secrets.DEPLOY_PATH }}
+          overwrite: true
 
   deploy:
     runs-on: ubuntu-latest
