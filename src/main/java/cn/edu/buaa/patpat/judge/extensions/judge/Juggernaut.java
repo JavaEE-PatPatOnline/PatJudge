@@ -1,10 +1,10 @@
-package cn.edu.buaa.patpat.judge.services.impl;
+package cn.edu.buaa.patpat.judge.extensions.judge;
 
+import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.config.JudgeOptions;
 import cn.edu.buaa.patpat.judge.dto.*;
 import cn.edu.buaa.patpat.judge.models.ProblemDescriptor;
 import cn.edu.buaa.patpat.judge.services.ICompiler;
-import cn.edu.buaa.patpat.judge.services.IJudger;
 import cn.edu.buaa.patpat.judge.utils.Medias;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -30,21 +30,23 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 @Slf4j
 public class Juggernaut implements IJudger {
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(3);
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Globals.CONCURRENT_JUDGE_LIMIT);
 
-    private final JudgeOptions judgeOptions;
+    private final JudgeOptions options;
     private final ObjectMapper yamlMapper;
     private final ModelMapper modelMapper;
     private final ICompiler compiler;
 
     @Override
     public JudgeResponse judge(JudgeRequest request) {
+        String sandbox = options.getSandBoxPath();
+
         // initialize problem
         ProblemDescriptor descriptor;
         try {
             String binary = checkVersion(request.getLanguage());
-            descriptor = initProblem(request.getProblemId(), request.getId());
-            compiler.compileCode(binary, judgeOptions.getJudgePath(request.getId()).toString());
+            descriptor = initProblem(request.getProblemId());
+            compiler.compileCode(binary, sandbox);
         } catch (JudgeErrorException e) {
             return formatResponse(request, e.getResult());
         } catch (JudgeFailedException e) {
@@ -54,9 +56,9 @@ public class Juggernaut implements IJudger {
         // run test cases
         List<Avatar> avatars = descriptor.getCases().stream()
                 .map(testCase -> new Avatar(
-                        judgeOptions.getProblemPath(request.getProblemId()).toString(),
-                        judgeOptions.getJudgeClassPath(request.getId()).toString(),
-                        judgeOptions.getBinPath(request.getLanguage()),
+                        options.getProblemPath(request.getProblemId()).toString(),
+                        sandbox,
+                        options.getBinPath(request.getLanguage()),
                         descriptor,
                         testCase)
                 ).toList();
@@ -67,6 +69,7 @@ public class Juggernaut implements IJudger {
                 results.add(future.get());
             }
         } catch (InterruptedException | ExecutionException e) {
+            log.error("Failed to run test cases: {}.", e.getMessage());
             return formatResponse(request, TestCaseResult.of(TestResultEnum.JE, "Failed to run test cases."));
         }
 
@@ -80,26 +83,26 @@ public class Juggernaut implements IJudger {
     }
 
     private String checkVersion(String language) throws JudgeErrorException {
-        String binary = judgeOptions.getBinPath(language);
+        String binary = options.getBinPath(language);
         if (binary == null) {
             throw new JudgeErrorException(TestCaseResult.of(TestResultEnum.CE, "Java version " + language + " is not supported."));
         }
         return binary;
     }
 
-    private ProblemDescriptor initProblem(int problemId, int submissionId) throws JudgeErrorException {
+    private ProblemDescriptor initProblem(int problemId) throws JudgeErrorException {
         ProblemDescriptor descriptor;
         try {
-            descriptor = yamlMapper.readValue(judgeOptions.getProblemYamlPath(problemId).toFile(), ProblemDescriptor.class);
+            descriptor = yamlMapper.readValue(options.getProblemYamlPath(problemId).toFile(), ProblemDescriptor.class);
             if (descriptor.isInit()) {
-                Path problemInitPath = judgeOptions.getProblemInitPath(problemId);
-                Path judgePath = judgeOptions.getJudgeSourcePath(submissionId);
-                Medias.copyContent(problemInitPath, judgePath);
+                Path problemInitPath = options.getProblemInitPath(problemId);
+                Path sourcePath = Path.of(options.getSandBoxPath(), "src");
+                Medias.copyContent(problemInitPath, sourcePath);
             }
             return descriptor;
         } catch (IOException e) {
             log.error("Failed to initialize problem {}: {}.", problemId, e.getMessage());
-            throw new JudgeErrorException(TestCaseResult.of(TestResultEnum.JE, "Failed to initialize problem."));
+            throw new JudgeErrorException(TestCaseResult.of(TestResultEnum.JE, "Failed to initialize problem"));
         }
     }
 

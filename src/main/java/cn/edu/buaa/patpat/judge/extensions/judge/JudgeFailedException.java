@@ -1,13 +1,13 @@
-package cn.edu.buaa.patpat.judge.services.impl;
+package cn.edu.buaa.patpat.judge.extensions.judge;
 
 import cn.edu.buaa.patpat.judge.dto.TestCaseResult;
 import lombok.Getter;
 
 @Getter
-public class JudgeErrorException extends Exception {
+public class JudgeFailedException extends Exception {
     private final TestCaseResult result;
 
-    public JudgeErrorException(TestCaseResult result) {
+    public JudgeFailedException(TestCaseResult result) {
         this.result = result;
     }
 }

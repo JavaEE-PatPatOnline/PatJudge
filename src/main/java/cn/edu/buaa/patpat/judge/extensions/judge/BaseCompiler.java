@@ -1,4 +1,4 @@
-package cn.edu.buaa.patpat.judge.services.impl;
+package cn.edu.buaa.patpat.judge.extensions.judge;
 
 import cn.edu.buaa.patpat.judge.dto.TestCaseResult;
 import cn.edu.buaa.patpat.judge.dto.TestResultEnum;
@@ -10,13 +10,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public abstract class BaseCompiler implements ICompiler {
+    protected abstract String[] getCompileCommand(String bin, String path);
+
     @Override
     public void compileCode(String bin, String path) throws JudgeErrorException, JudgeFailedException {
         String[] command = getCompileCommand(bin, path);
         compile(command, path);
     }
-
-    protected abstract String[] getCompileCommand(String bin, String path);
 
     private void compile(String[] command, String path) throws JudgeErrorException, JudgeFailedException {
         int exitValue;

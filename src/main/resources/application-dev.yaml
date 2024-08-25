@@ -1,5 +1,7 @@
 judge:
   languages:
+    - 17;E:\IDE\Java\jdk-17.0.5\bin
     - 20;E:\IDE\Java\jdk-20.0.2\bin
-  problem-root: ..\PatBoot\volume\bucket\problem
-  judge-root: ..\PatBoot\volume\judge
+  problem-root: ../volume/bucket/problem
+  submission-root: ../volume/bucket/submission
+  sandbox-path: ../volume/bucket/sandbox
