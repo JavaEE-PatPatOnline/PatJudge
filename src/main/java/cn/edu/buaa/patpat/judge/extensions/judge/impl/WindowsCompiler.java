@@ -3,7 +3,7 @@
  * Made with love by Tony Skywalker
  */
 
-package cn.edu.buaa.patpat.judge.extensions.judge;
+package cn.edu.buaa.patpat.judge.extensions.judge.impl;
 
 
 import org.springframework.context.annotation.Profile;

@@ -8,6 +8,7 @@ package cn.edu.buaa.patpat.judge.extensions.judge;
 import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.dto.TestCaseResult;
 import cn.edu.buaa.patpat.judge.dto.TestResultEnum;
+import cn.edu.buaa.patpat.judge.extensions.judge.exceptions.JudgeFailedException;
 import cn.edu.buaa.patpat.judge.models.CaseDescriptor;
 import cn.edu.buaa.patpat.judge.models.ProblemDescriptor;
 import cn.edu.buaa.patpat.judge.utils.Messages;
@@ -104,7 +105,6 @@ public class Avatar implements Callable<TestCaseResult> {
             return TestCaseResult.wa(diff);
         }
     }
-
 
     private IDiffProvider getDiffProvider(String mode) {
         if ("advanced".equalsIgnoreCase(mode)) {

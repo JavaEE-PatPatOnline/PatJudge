@@ -8,8 +8,9 @@ package cn.edu.buaa.patpat.judge.extensions.judge;
 import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.config.JudgeOptions;
 import cn.edu.buaa.patpat.judge.dto.*;
+import cn.edu.buaa.patpat.judge.extensions.judge.exceptions.JudgeErrorException;
+import cn.edu.buaa.patpat.judge.extensions.judge.exceptions.JudgeFailedException;
 import cn.edu.buaa.patpat.judge.models.ProblemDescriptor;
-import cn.edu.buaa.patpat.judge.services.ICompiler;
 import cn.edu.buaa.patpat.judge.utils.Medias;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ import java.util.concurrent.Future;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class Juggernaut implements IJudger {
+public class Juggernaut {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Globals.CONCURRENT_JUDGE_LIMIT);
 
     private final JudgeOptions options;
@@ -42,7 +43,6 @@ public class Juggernaut implements IJudger {
     private final ModelMapper modelMapper;
     private final ICompiler compiler;
 
-    @Override
     public JudgeResponse judge(JudgeRequest request) {
         String sandbox = options.getSandBoxPath();
 

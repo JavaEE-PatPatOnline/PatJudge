@@ -48,4 +48,11 @@ public class Messages {
         }
         return message.substring(0, Globals.MAX_MESSAGE_LENGTH) + "...";
     }
+
+    public static String truncateIfTooLong(String message, int maxLength) {
+        if (message.length() <= maxLength) {
+            return message;
+        }
+        return message.substring(0, maxLength) + "...";
+    }
 }
