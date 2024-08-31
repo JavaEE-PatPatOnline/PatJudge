@@ -1,6 +1,12 @@
+/*
+ * Copyright (C) Patpat Online 2024
+ * Made with love by Tony Skywalker
+ */
+
 package cn.edu.buaa.patpat.judge.utils.diff;
 
 import cn.edu.buaa.patpat.judge.config.Globals;
+import cn.edu.buaa.patpat.judge.utils.Messages;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 
@@ -22,19 +28,19 @@ public class AdvancedDiffProvider implements IDiffProvider {
         List<DiffRow> rows = generator.generateDiffRows(expected, actual);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("|Line|Expected|Actual|\n");
-        sb.append("|:--:|:------:|:----:|\n");
+        sb.append("| 行号 | 期望输出 | 实际输出 |");
+        sb.append("|:----:|:-------:|:-------:|");
         int line = 0;
         int count = 0;
         for (DiffRow row : rows) {
             if (!row.getOldLine().equals(row.getNewLine())) {
-                sb.append('|').append(line).append('|')
-                        .append(row.getOldLine()).append('|')
-                        .append(row.getNewLine().length() > Globals.MAX_MESSAGE_LENGTH ? "*Line too long!*" : row.getNewLine())
-                        .append('|').append('\n');
+                sb.append("| ").append(line).append(" | ")
+                        .append(row.getOldLine()).append(" | ")
+                        .append(Messages.truncateIfTooLong(row.getNewLine(), Globals.MAX_DIFF_CHARS))
+                        .append(" |\n");
                 count++;
                 if (count > Globals.MAX_DIFF_ROWS) {
-                    sb.append("|...|...|...|\n");
+                    sb.append("| ... | ... | ... |\n");
                     break;
                 }
             }

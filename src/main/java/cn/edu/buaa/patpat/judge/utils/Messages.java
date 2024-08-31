@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) Patpat Online 2024
+ * Made with love by Tony Skywalker
+ */
+
 package cn.edu.buaa.patpat.judge.utils;
 
 import cn.edu.buaa.patpat.judge.config.Globals;
@@ -42,5 +47,12 @@ public class Messages {
             return message;
         }
         return message.substring(0, Globals.MAX_MESSAGE_LENGTH) + "...";
+    }
+
+    public static String truncateIfTooLong(String message, int maxLength) {
+        if (message.length() <= maxLength) {
+            return message;
+        }
+        return message.substring(0, maxLength) + "...";
     }
 }

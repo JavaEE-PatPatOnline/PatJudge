@@ -1,9 +1,14 @@
+/*
+ * Copyright (C) Patpat Online 2024
+ * Made with love by Tony Skywalker
+ */
+
 package cn.edu.buaa.patpat.judge.services;
 
 import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.config.JudgeOptions;
 import cn.edu.buaa.patpat.judge.dto.*;
-import cn.edu.buaa.patpat.judge.extensions.judge.IJudger;
+import cn.edu.buaa.patpat.judge.extensions.judge.Juggernaut;
 import cn.edu.buaa.patpat.judge.utils.Medias;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,7 +25,7 @@ public abstract class JudgeService {
     @Autowired
     protected RabbitTemplate rabbitTemplate;
     @Autowired
-    private IJudger judger;
+    private Juggernaut judger;
     @Autowired
     private JudgeOptions options;
     @Autowired

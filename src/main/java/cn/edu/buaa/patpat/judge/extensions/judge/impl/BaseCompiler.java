@@ -1,8 +1,15 @@
-package cn.edu.buaa.patpat.judge.extensions.judge;
+/*
+ * Copyright (C) Patpat Online 2024
+ * Made with love by Tony Skywalker
+ */
+
+package cn.edu.buaa.patpat.judge.extensions.judge.impl;
 
 import cn.edu.buaa.patpat.judge.dto.TestCaseResult;
 import cn.edu.buaa.patpat.judge.dto.TestResultEnum;
-import cn.edu.buaa.patpat.judge.services.ICompiler;
+import cn.edu.buaa.patpat.judge.extensions.judge.ICompiler;
+import cn.edu.buaa.patpat.judge.extensions.judge.exceptions.JudgeErrorException;
+import cn.edu.buaa.patpat.judge.extensions.judge.exceptions.JudgeFailedException;
 import cn.edu.buaa.patpat.judge.utils.process.IProcessDescriptor;
 import cn.edu.buaa.patpat.judge.utils.process.ProcessDescriptor;
 

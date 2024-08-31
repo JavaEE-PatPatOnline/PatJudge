@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) Patpat Online 2024
+ * Made with love by Tony Skywalker
+ */
+
 package cn.edu.buaa.patpat.judge.utils.diff;
 
 import java.util.List;
@@ -16,16 +21,17 @@ public class BasicDiffProvider implements IDiffProvider {
             var actualLine = actualIt.next();
             var expectedLine = expectedIt.next();
             if (!expectedLine.equals(actualLine)) {
-                return String.format("Line %d: expected `%s`, but got `%s`", line, expectedLine, actualLine);
+                // Line %d: expected `%s`, but got `%s`
+                return String.format("第 %d 行: 期望输出 `%s`, 实际输出 `%s`", line, expectedLine, actualLine);
             }
             line++;
         }
 
         if (expectedIt.hasNext()) {
-            return "Output ends prematurely";
+            return "输出过少";
         }
         if (actualIt.hasNext()) {
-            return "Output has extra lines";
+            return "输出过多";
         }
 
         return null;
