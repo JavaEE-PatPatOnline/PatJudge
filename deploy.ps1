@@ -24,7 +24,7 @@
 
 # Pack target/*.jar and Dockerfile into tar.gz
 Write-Host "Packing target/*.jar and Dockerfile into tar.gz"
-$randomString = -join ((65..90) + (97..122) | Get-Random -Count 10 | % {[char]$_})
+$randomString = -join ((65..90) + (97..122) | Get-Random -Count 10 | % { [char]$_ })
 $archiveName = "$randomString.tar.gz"
 tar -czf $archiveName target/*.jar Dockerfile
 
@@ -32,7 +32,8 @@ tar -czf $archiveName target/*.jar Dockerfile
 $envFile = Get-Content .env
 $hostConnection = $envFile[0]
 $deployPath = $envFile[1]
-if (-not $hostConnection -or -not $deployPath) {
+if (-not $hostConnection -or -not $deployPath)
+{
     Write-Host "Error: .env file is missing hostConnection or deployPath"
     exit 1
 }
@@ -43,7 +44,8 @@ scp $archiveName ${hostConnection}:/tmp/$archiveName
 
 # Execute remote commands:
 Write-Host "Executing deploy commands"
-$commands= @(
+$commands = @(
+    "buaalogin; ",
     "tar -xzf /tmp/$archiveName -C $deployPath --overwrite",
     " && rm /tmp/$archiveName",
     " && cd $deployPath",

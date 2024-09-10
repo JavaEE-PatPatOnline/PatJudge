@@ -50,7 +50,7 @@
             </encoder>
         </appender>
 
-        <root level="warning">
+        <root level="warn">
             <appender-ref ref="FILE-ROLLING"/>
         </root>
     </springProfile>
