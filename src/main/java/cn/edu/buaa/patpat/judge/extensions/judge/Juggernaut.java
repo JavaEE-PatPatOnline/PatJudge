@@ -101,8 +101,7 @@ public class Juggernaut {
             descriptor = yamlMapper.readValue(options.getProblemYamlPath(problemId).toFile(), ProblemDescriptor.class);
             if (descriptor.isInit()) {
                 Path problemInitPath = options.getProblemInitPath(problemId);
-                Path sourcePath = Path.of(options.getSandBoxPath(), "src");
-                Medias.copyContent(problemInitPath, sourcePath);
+                Medias.copyContent(problemInitPath, Path.of(options.getSandBoxPath()));
             }
             return descriptor;
         } catch (IOException e) {
