@@ -54,4 +54,8 @@ public class JudgeOptions {
     public Path getProblemInitPath(int problemId) {
         return Path.of(problemRoot, String.valueOf(problemId), "init");
     }
+
+    public Path getProblemInjectPath(int problemId) {
+        return Path.of(problemRoot, String.valueOf(problemId), "src");
+    }
 }

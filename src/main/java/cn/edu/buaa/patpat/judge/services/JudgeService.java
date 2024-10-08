@@ -5,7 +5,6 @@
 
 package cn.edu.buaa.patpat.judge.services;
 
-import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.config.JudgeOptions;
 import cn.edu.buaa.patpat.judge.dto.*;
 import cn.edu.buaa.patpat.judge.extensions.judge.Juggernaut;
@@ -16,7 +15,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 
@@ -63,17 +61,5 @@ public abstract class JudgeService {
         Path submissionPath = Path.of(options.getSubmissionRoot(), request.getRecord());
         Path sourcePath = Path.of(sandbox, "src");
         Medias.copyDirectory(submissionPath, sourcePath);
-
-        initSecurityPolicy(sandbox);
-    }
-
-    private void initSecurityPolicy(String path) throws IOException {
-        String content = String.format("""
-                        grant {
-                            permission java.io.FilePermission "%s", "read, write";
-                        };
-                        """,
-                Path.of(path, "-"));
-        Files.writeString(Path.of(path, Globals.POLICY_FILENAME), content);
     }
 }

@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +59,23 @@ public class Juggernaut {
             return formatResponse(request, e.getResult());
         }
 
+        // prepare testcase runners
+        List<Avatar> avatars = new ArrayList<>();
+        var cases = descriptor.getCases();
+        for (int i = 0; i < cases.size(); i++) {
+            var testCase = cases.get(i);
+            var workingDirectory = getTestcaseWorkingDirectory(request.getProblemId(), i + 1);
+            var avatar = new Avatar(
+                    options.getProblemPath(request.getProblemId()).toString(),
+                    workingDirectory.toString(),
+                    options.getBinPath(request.getLanguage()),
+                    descriptor,
+                    testCase
+            );
+            avatars.add(avatar);
+        }
+
         // run test cases
-        List<Avatar> avatars = descriptor.getCases().stream()
-                .map(testCase -> new Avatar(
-                        options.getProblemPath(request.getProblemId()).toString(),
-                        sandbox,
-                        options.getBinPath(request.getLanguage()),
-                        descriptor,
-                        testCase)
-                ).toList();
         List<TestCaseResult> results = new ArrayList<>();
         try {
             List<Future<TestCaseResult>> futures = EXECUTOR_SERVICE.invokeAll(avatars);
@@ -99,10 +108,32 @@ public class Juggernaut {
         ProblemDescriptor descriptor;
         try {
             descriptor = yamlMapper.readValue(options.getProblemYamlPath(problemId).toFile(), ProblemDescriptor.class);
-            if (descriptor.isInit()) {
-                Path problemInitPath = options.getProblemInitPath(problemId);
-                Medias.copyContent(problemInitPath, Path.of(options.getSandBoxPath()));
+
+            // inject source code if needed
+            Path problemInjectPath = options.getProblemInjectPath(problemId);
+            if (problemInjectPath.toFile().exists()) {
+                Medias.copyContent(problemInjectPath, Path.of(options.getSandBoxPath(), "src"));
             }
+
+            // initialize testcase folders
+            int count = descriptor.getCases().size();
+            for (int i = 1; i <= count; i++) {
+                var path = getTestcaseWorkingDirectory(problemId, i);
+                Medias.ensureEmptyPath(path);
+                initSecurityPolicy(path.toString());
+            }
+
+            // add init files if needed
+            // WARNING: security policy can be overwritten by the init files,
+            //         it can be used to bypass the security policy.
+            if (descriptor.isInit()) {
+                for (int i = 1; i <= count; i++) {
+                    var path = getTestcaseWorkingDirectory(problemId, i);
+                    Path problemInitPath = options.getProblemInitPath(problemId);
+                    Medias.copyContent(problemInitPath, path);
+                }
+            }
+
             return descriptor;
         } catch (IOException e) {
             log.error("Failed to initialize problem {}: {}.", problemId, e.getMessage());
@@ -122,5 +153,19 @@ public class Juggernaut {
         response.setScore(result.getScore());
         response.setResult(result);
         return response;
+    }
+
+    private void initSecurityPolicy(String path) throws IOException {
+        String content = String.format("""
+                        grant {
+                            permission java.io.FilePermission "%s", "read, write, execute, delete";
+                        };
+                        """,
+                Path.of(path, "-"));
+        Files.writeString(Path.of(path, Globals.POLICY_FILENAME), content);
+    }
+
+    private Path getTestcaseWorkingDirectory(int problemId, int testcaseId) {
+        return Path.of(options.getSandBoxPath(), "test" + testcaseId);
     }
 }

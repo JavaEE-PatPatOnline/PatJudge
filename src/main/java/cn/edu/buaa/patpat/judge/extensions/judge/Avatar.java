@@ -69,7 +69,7 @@ public class Avatar implements Callable<TestCaseResult> {
                     .exec(exe,
                             "-Djava.security.manager",
                             "-Djava.security.policy=" + Globals.POLICY_FILENAME,
-                            "-classpath", "out",
+                            "-classpath", "../out",
                             descriptor.getMainClass())
                     .setWorkingDirectory(judgePath)
                     .redirectInput(inputPath.toString())
