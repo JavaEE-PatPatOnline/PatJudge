@@ -28,15 +28,15 @@ public class AdvancedDiffProvider implements IDiffProvider {
         List<DiffRow> rows = generator.generateDiffRows(expected, actual);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("| 行号 | 期望输出 | 实际输出 |");
-        sb.append("|:----:|:-------:|:-------:|");
+        sb.append("| 行号 | 期望输出 | 实际输出 |\n");
+        sb.append("|:----:|:-------:|:-------:|\n");
         int line = 0;
         int count = 0;
         for (DiffRow row : rows) {
             if (!row.getOldLine().equals(row.getNewLine())) {
                 sb.append("| ").append(line).append(" | ")
-                        .append(row.getOldLine()).append(" | ")
-                        .append(Messages.truncateIfTooLong(row.getNewLine(), Globals.MAX_DIFF_CHARS))
+                        .append(postProcessDiff(row.getOldLine(), "**")).append(" | ")
+                        .append(postProcessDiff(Messages.truncateIfTooLong(row.getNewLine(), Globals.MAX_DIFF_CHARS), "~~"))
                         .append(" |\n");
                 count++;
                 if (count > Globals.MAX_DIFF_ROWS) {
@@ -48,5 +48,54 @@ public class AdvancedDiffProvider implements IDiffProvider {
         }
 
         return count == 0 ? null : sb.toString();
+    }
+
+    /**
+     * Move space in paired ** and ~~ to the outside.
+     * e.g. a**  b **c to a  **b** c
+     *
+     * @param line The line to be processed.
+     * @return The processed line.
+     * @apiNote This method is used to post-process the diff result.
+     * Because the frontend cannot handle bold that contains spaces, we need to
+     * move the spaces outside the bold.
+     * <p>
+     * And to add unit test for this method, I made it public, which is not a
+     * good practice.
+     */
+    public String postProcessDiff(String line, String tag) {
+        StringBuilder sb = new StringBuilder();
+        int left = line.indexOf(tag);
+        int right = 0;
+        while (left != -1) {
+            sb.append(line, right, left);
+            right = line.indexOf(tag, left + tag.length());
+            if (right == -1) {
+                sb.append(line, left, line.length());
+                break;
+            }
+
+            int start = left + tag.length();
+            while (start < right && line.charAt(start) == ' ') {
+                sb.append(' ');
+                start++;
+            }
+            sb.append(tag);
+            int end = right - 1;
+            while (end > start && line.charAt(end) == ' ') {
+                end--;
+            }
+            sb.append(line, start, end + 1);
+            sb.append(tag);
+            sb.append(" ".repeat(Math.max(0, right - end - 1)));
+
+            right += tag.length();
+            left = line.indexOf(tag, right);
+        }
+        if (sb.length() != line.length()) {
+            sb.append(line, sb.length(), line.length());
+        }
+
+        return sb.toString();
     }
 }
