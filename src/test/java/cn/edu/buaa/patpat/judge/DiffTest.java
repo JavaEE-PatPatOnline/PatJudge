@@ -32,5 +32,7 @@ public class DiffTest {
                 .isEqualTo("  ~~b~~ ");
         assertThat(provider.postProcessDiff("~~  b ~", "~~"))
                 .isEqualTo("~~  b ~");
+        assertThat(provider.postProcessDiff("a,** **b", "**"))
+                .isEqualTo("a, b");
     }
 }

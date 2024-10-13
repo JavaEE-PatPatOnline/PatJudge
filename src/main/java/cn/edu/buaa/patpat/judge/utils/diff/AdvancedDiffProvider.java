@@ -96,6 +96,6 @@ public class AdvancedDiffProvider implements IDiffProvider {
             sb.append(line, sb.length(), line.length());
         }
 
-        return sb.toString();
+        return sb.toString().replace(tag + tag, "");
     }
 }
