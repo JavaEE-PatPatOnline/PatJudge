@@ -9,9 +9,11 @@ import cn.edu.buaa.patpat.judge.config.Globals;
 import cn.edu.buaa.patpat.judge.utils.Messages;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 public class AdvancedDiffProvider implements IDiffProvider {
     @Override
     public String diff(List<String> expected, List<String> actual) {
@@ -36,7 +38,7 @@ public class AdvancedDiffProvider implements IDiffProvider {
             if (!row.getOldLine().equals(row.getNewLine())) {
                 sb.append("| ").append(line).append(" | ")
                         .append(postProcessDiff(row.getOldLine(), "**")).append(" | ")
-                        .append(postProcessDiff(Messages.truncateIfTooLong(row.getNewLine(), Globals.MAX_DIFF_CHARS), "~~"))
+                        .append(Messages.truncateIfTooLong(postProcessDiff(row.getNewLine(), "~~"), Globals.MAX_DIFF_CHARS))
                         .append(" |\n");
                 count++;
                 if (count > Globals.MAX_DIFF_ROWS) {
@@ -64,6 +66,15 @@ public class AdvancedDiffProvider implements IDiffProvider {
      * good practice.
      */
     public String postProcessDiff(String line, String tag) {
+        try {
+            return postProcessDiffImpl(line, tag);
+        } catch (Exception e) {
+            log.error("Failed to post-process diff ({}): {}\n{}", tag, e.getMessage(), line);
+            return line;
+        }
+    }
+
+    private String postProcessDiffImpl(String line, String tag) {
         StringBuilder sb = new StringBuilder();
         int left = line.indexOf(tag);
         int right = 0;
