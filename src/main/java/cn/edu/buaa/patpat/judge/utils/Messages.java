@@ -27,7 +27,11 @@ public class Messages {
             if (sb.length() + line.length() <= Globals.MAX_MESSAGE_LENGTH) {
                 sb.append(line).append("\n");
             } else {
-                sb.append(line, 0, Globals.MAX_MESSAGE_LENGTH - sb.length());
+                // Warning: If we entered the true branch with ==, then there will be
+                //  sb.length() + line.length() == Globals.MAX_MESSAGE_LENGTH + 1
+                //  which will cause end index to be out of bounds, so we need to subtract 1
+                //  or simply use Math.max(0, ...)
+                sb.append(line, 0, Math.max(0, Globals.MAX_MESSAGE_LENGTH - sb.length()));
                 sb.append("...");
                 break;
             }
