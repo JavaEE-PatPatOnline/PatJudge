@@ -32,7 +32,7 @@ public class AdvancedDiffProvider implements IDiffProvider {
         StringBuilder sb = new StringBuilder();
         sb.append("| 行号 | 期望输出 | 实际输出 |\n");
         sb.append("|:----:|:-------:|:-------:|\n");
-        int line = 0;
+        int line = 1;   // line number starts from 1
         int count = 0;
         for (DiffRow row : rows) {
             if (!row.getOldLine().equals(row.getNewLine())) {
@@ -46,7 +46,15 @@ public class AdvancedDiffProvider implements IDiffProvider {
                     break;
                 }
             }
-            line++;
+
+            /*
+             * Only increment the line number when the row is not an insert.
+             * This ensures the final line numbers are always from the standard
+             * answer, which is more meaningful.
+             */
+            if (row.getTag() != DiffRow.Tag.INSERT) {
+                line++;
+            }
         }
 
         return count == 0 ? null : sb.toString();
@@ -64,6 +72,9 @@ public class AdvancedDiffProvider implements IDiffProvider {
      * <p>
      * And to add unit test for this method, I made it public, which is not a
      * good practice.
+     * <p>
+     * It seems even after this process, the frontend may still fail to render
+     * some diffs. But this is the best we can do for now.
      */
     public String postProcessDiff(String line, String tag) {
         try {
