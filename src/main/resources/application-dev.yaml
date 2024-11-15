@@ -5,3 +5,4 @@ judge:
   problem-root: ../volume/bucket/problem
   submission-root: ../volume/bucket/submission
   sandbox-path: ../volume/bucket/sandbox
+  timeout: 10

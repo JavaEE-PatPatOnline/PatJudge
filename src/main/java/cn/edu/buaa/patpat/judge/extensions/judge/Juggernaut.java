@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -23,10 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * The Juggernaut is a powerful judger that can judge the submitted code.
@@ -43,6 +41,9 @@ public class Juggernaut {
     private final ObjectMapper yamlMapper;
     private final ModelMapper modelMapper;
     private final ICompiler compiler;
+
+    @Value("${judge.timeout}")
+    private long timeout;
 
     public JudgeResponse judge(JudgeRequest request) {
         String sandbox = options.getSandBoxPath();
@@ -80,11 +81,17 @@ public class Juggernaut {
         try {
             List<Future<TestCaseResult>> futures = EXECUTOR_SERVICE.invokeAll(avatars);
             for (Future<TestCaseResult> future : futures) {
-                results.add(future.get());
+                results.add(future.get(timeout, TimeUnit.SECONDS));
             }
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to run test cases: {}.", e.getMessage());
+            log.error(toErrorLogMessage("Failed to run test cases: {}", request), e.getMessage());
             return formatResponse(request, TestCaseResult.of(TestResultEnum.JE, "Failed to run test cases."));
+        } catch (TimeoutException e) {
+            log.error(toErrorLogMessage("One or more testcases timed out: {}", request), e.getMessage());
+            return formatResponse(request, TestCaseResult.of(TestResultEnum.TLE, e.getMessage()));
+        } catch (Exception e) {
+            log.error(toErrorLogMessage("Unexpected exception when running test cases", request), e);
+            return formatResponse(request, TestCaseResult.of(TestResultEnum.JE, "Contact T.A. for more information."));
         }
 
         // format response
@@ -93,6 +100,7 @@ public class Juggernaut {
             result.addScore(testCaseResult.getScore());
             result.addResult(testCaseResult);
         }
+
         return formatResponse(request, result.build());
     }
 
@@ -167,5 +175,9 @@ public class Juggernaut {
 
     private Path getTestcaseWorkingDirectory(int problemId, int testcaseId) {
         return Path.of(options.getSandBoxPath(), "test" + testcaseId);
+    }
+
+    private String toErrorLogMessage(String message, JudgeRequest request) {
+        return "[Submission " + request.getId() + "] " + message;
     }
 }

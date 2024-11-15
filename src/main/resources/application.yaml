@@ -12,3 +12,4 @@ judge:
   problem-root: /problem
   submission-root: /submission
   sandbox-path: /sandbox
+  timeout: 120
