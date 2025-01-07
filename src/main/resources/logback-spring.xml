@@ -15,19 +15,16 @@
         <property name="HOME_LOG" value="/log"/>
         <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${HOME_LOG}/judge.log</file>
-
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${HOME_LOG}/judge/judge.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                    <maxFileSize>10MB</maxFileSize>
-                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxFileSize>10MB</maxFileSize>
                 <maxHistory>60</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
             </rollingPolicy>
             <encoder>
                 <pattern>%d %p %c{1} [%t] %m%n</pattern>
             </encoder>
         </appender>
-
         <root level="info">
             <appender-ref ref="FILE-ROLLING"/>
         </root>
@@ -37,19 +34,16 @@
         <property name="HOME_LOG" value="/log"/>
         <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${HOME_LOG}/judge.log</file>
-
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${HOME_LOG}/judge/judge.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                    <maxFileSize>10MB</maxFileSize>
-                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxFileSize>10MB</maxFileSize>
                 <maxHistory>60</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
             </rollingPolicy>
             <encoder>
                 <pattern>%d %p %c{1} [%t] %m%n</pattern>
             </encoder>
         </appender>
-
         <root level="warn">
             <appender-ref ref="FILE-ROLLING"/>
         </root>
